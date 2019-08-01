@@ -3,9 +3,6 @@ package io.tjf.releasenotes.generator;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import io.tjf.releasenotes.helper.CommitUtils;
 import io.tjf.releasenotes.helper.IssueType;
 import io.tjf.releasenotes.helper.PullRequestCommit;
@@ -21,9 +18,6 @@ public class Section {
 	}
 
 	public Section(String title, String emoji, List<String> labels) {
-		Assert.hasText(title, "Title must not be empty");
-		Assert.hasText(emoji, "Emoji must not be empty");
-		Assert.isTrue(!CollectionUtils.isEmpty(labels), "Labels must not be empty");
 		this.title = title;
 		this.emoji = emoji;
 		this.labels = labels;

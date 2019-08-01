@@ -4,25 +4,35 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @ConfigurationProperties(prefix = "releasenotes")
 public class ApplicationProperties {
 
 	/**
 	 * Document title.
 	 */
+	@NotBlank
 	private String title;
 
 	/**
 	 * Release notes file destination.
 	 */
+	@NotBlank
 	private String file;
 
 	/**
 	 * Base URL link for the issues.
 	 */
+	@URL
+	@NotBlank
 	private String issueLinkBaseUrl;
 
 	/**
@@ -38,6 +48,7 @@ public class ApplicationProperties {
 	/**
 	 * Relase notes properties.
 	 */
+	@NotEmpty
 	private final List<Release> releases = new ArrayList<>();
 
 	public String getTitle() {
@@ -84,32 +95,37 @@ public class ApplicationProperties {
 		/**
 		 * Azure username.
 		 */
+		@NotBlank
 		private String username;
 
 		/**
 		 * Azure password.
 		 */
+		@NotBlank
 		private String password;
 
 		/**
 		 * Azure instance name.
 		 */
+		@NotBlank
 		private String organization;
 
 		/**
 		 * Azure project name.
 		 */
+		@NotBlank
 		private String project;
 
 		/**
 		 * Azure git source repository name.
 		 */
+		@NotBlank
 		private String repository;
 
 		/**
 		 * Azure git branch name.
 		 */
-		private String branch;
+		private String branch = "master";
 
 		public String getUsername() {
 			return username;
@@ -169,6 +185,7 @@ public class ApplicationProperties {
 		/**
 		 * Release title.
 		 */
+		@NotBlank
 		private String title;
 
 		/**
@@ -230,16 +247,19 @@ public class ApplicationProperties {
 		/**
 		 * Section title.
 		 */
+		@NotBlank
 		private String title;
 
 		/**
 		 * Section emoji character.
 		 */
+		@NotBlank
 		private String emoji;
 
 		/**
 		 * Section identifying labels.
 		 */
+		@NotEmpty
 		private List<String> labels = new ArrayList<>();
 
 		public String getTitle() {

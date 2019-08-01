@@ -62,7 +62,7 @@ public class CommitService extends AzureService {
 		List<PullRequestCommit> pullRequests = new ArrayList<>();
 
 		// Filter for pull requests only.
-		addFormmatedPullRequestCommit(pullRequests, -1, CommitUtils.filterPullRequestCommits(commits));
+		addFormmatedPullRequestCommit(pullRequests, -1, commits);
 
 		return pullRequests;
 	}
