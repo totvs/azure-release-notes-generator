@@ -3,9 +3,12 @@ package io.tjf.releasenotes.generator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.FileCopyUtils;
@@ -75,14 +78,22 @@ public class Generator {
 	}
 
 	private String getFormmatedCommitMessage(PullRequestCommit prCommit) {
+		String message = "";
 		String issue = prCommit.getIssue();
 		String issueLink = "";
+		String breakingChange = prCommit.getBreakingChange();
 
 		if (!StringUtils.isEmpty(issue)) {
 			issueLink = " (" + getLinkToIssue(issue) + ")";
 		}
 
-		return "- " + prCommit.getMessage() + issueLink + BREAK_LINE;
+		message = "- " + prCommit.getMessage() + issueLink + BREAK_LINE;
+
+		if (!StringUtils.isEmpty(breakingChange)) {
+			message += "    * :warning: **BREAKING CHANGE:** " + breakingChange + BREAK_LINE;
+		}
+
+		return message;
 	}
 
 	private String getLinkToIssue(String issue) {
@@ -90,7 +101,16 @@ public class Generator {
 	}
 
 	private void writeContentToFile(String content, String path) throws IOException {
-		FileCopyUtils.copy(content, new FileWriter(new File(path)));
+		File file = new File(path);
+
+		// Append the file content.
+		if (file.exists()) {
+			Stream<String> lines = Files.lines(file.toPath());
+			content += lines.collect(Collectors.joining("\n"));
+			lines.close();
+		}
+
+		FileCopyUtils.copy(content, new FileWriter(file));
 	}
 
 }

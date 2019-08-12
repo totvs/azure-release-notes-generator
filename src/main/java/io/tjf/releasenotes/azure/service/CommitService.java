@@ -70,6 +70,7 @@ public class CommitService extends AzureService {
 	private void addFormmatedPullRequestCommit(List<PullRequestCommit> prs, int parentPrId, List<Commit> commits) {
 		for (Commit commit : commits) {
 			String comment = commit.getComment();
+			String description = "";
 
 			int prId = CommitUtils.getPullRequestIdFromCommitComment(comment);
 			IssueType issueType;
@@ -77,6 +78,7 @@ public class CommitService extends AzureService {
 			if (prId > -1) {
 				List<String> labels = pullRequestService.getPullRequestLabelsNames(prId);
 				issueType = CommitUtils.getIssueTypeFromPullRequestLabels(labels);
+				description = pullRequestService.getPullRequest(prId).getDescription();
 			} else {
 				issueType = CommitUtils.getIssueTypeFromCommitComment(comment);
 			}
@@ -93,8 +95,9 @@ public class CommitService extends AzureService {
 
 			String message = CommitUtils.getFormmatedMessageFromCommitComment(comment);
 			String issue = CommitUtils.getIssueFromCommitComment(comment);
+			String breakingChange = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
 
-			prs.add(new PullRequestCommit(parentPrId, issueType, issue, message, commit));
+			prs.add(new PullRequestCommit(parentPrId, issueType, issue, message, breakingChange, commit));
 		}
 	}
 
