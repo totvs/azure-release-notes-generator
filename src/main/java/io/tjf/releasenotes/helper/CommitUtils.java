@@ -15,6 +15,7 @@ public class CommitUtils {
 
 	private static final String MERGED_TEXT = "Merged";
 	private static final String MERGED_PR_TEXT = MERGED_TEXT + " PR";
+	private static final String BREAKING_CHANGE_PREFIX = "BREAKING CHANGE:";
 
 	/**
 	 * Filters and converts the commit result for pull request commits only.
@@ -126,7 +127,30 @@ public class CommitUtils {
 			return null;
 		}
 
-		return comment.substring(comment.lastIndexOf("(") + 1, comment.lastIndexOf(")"));
+		comment = comment.substring(comment.lastIndexOf("(") + 1, comment.lastIndexOf(")"));
+
+		return comment;
+	}
+
+	/**
+	 * Returns the breaking change text from the pull request description (if
+	 * available).
+	 * 
+	 * @param description Pull request description.
+	 * @return Breaking change text.
+	 */
+	public static String getFormmatedBreakingChangeTextFromPullRequestDescription(String description) {
+		String text = "";
+
+		if (!description.contains(BREAKING_CHANGE_PREFIX)) {
+			return text;
+		}
+
+		text = description.substring(description.indexOf(BREAKING_CHANGE_PREFIX) + BREAKING_CHANGE_PREFIX.length());
+		text = text.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+		text = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+		return text;
 	}
 
 }

@@ -29,6 +29,11 @@ public class ApplicationProperties {
 	private String file;
 
 	/**
+	 * true to append file content.
+	 */
+	private boolean append = false;
+
+	/**
 	 * Base URL link for the issues.
 	 */
 	@URL
@@ -65,6 +70,14 @@ public class ApplicationProperties {
 
 	public String getFile() {
 		return file;
+	}
+
+	public boolean getAppend() {
+		return append;
+	}
+
+	public void setAppend(boolean append) {
+		this.append = append;
 	}
 
 	public void setIssueLinkBaseUrl(String issueLinkBaseUrl) {

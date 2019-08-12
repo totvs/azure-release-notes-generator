@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import io.tjf.releasenotes.azure.payload.Commit;
 import io.tjf.releasenotes.azure.payload.Label;
+import io.tjf.releasenotes.azure.payload.PullRequest;
 import io.tjf.releasenotes.azure.payload.Result;
 import io.tjf.releasenotes.azure.service.CommitService.CommitResult;
 import io.tjf.releasenotes.properties.ApplicationProperties;
@@ -27,6 +28,16 @@ public class PullRequestService extends AzureService {
 
 	public PullRequestService(RestTemplateBuilder builder, ApplicationProperties properties) {
 		super(builder, properties);
+	}
+
+	/**
+	 * Return the pull request information.
+	 * 
+	 * @param pullRequestId Pull request id.
+	 * @return Pull request object.
+	 */
+	public PullRequest getPullRequest(int pullRequestId) {
+		return get(PullRequest.class, PR_URI, pullRequestId);
 	}
 
 	/**
