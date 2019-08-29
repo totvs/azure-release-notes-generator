@@ -2,6 +2,7 @@ package io.tjf.releasenotes.helper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import io.tjf.releasenotes.azure.payload.Commit;
@@ -16,6 +17,9 @@ public class CommitUtils {
 	private static final String MERGED_TEXT = "Merged";
 	private static final String MERGED_PR_TEXT = MERGED_TEXT + " PR";
 	private static final String BREAKING_CHANGE_PREFIX = "BREAKING CHANGE:";
+
+	private CommitUtils() {
+	}
 
 	/**
 	 * Filters and converts the commit result for pull request commits only.
@@ -38,8 +42,8 @@ public class CommitUtils {
 
 		if (comment.indexOf(MERGED_PR_TEXT) >= 0) {
 			int len = MERGED_PR_TEXT.length();
-			comment = comment.substring(comment.indexOf(MERGED_PR_TEXT) + len, comment.indexOf(":"));
-			comment = comment.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+			comment = comment.substring(comment.indexOf(MERGED_PR_TEXT) + len, comment.indexOf(':'));
+			comment = allTrim(comment);
 			pullRequestId = Integer.parseInt(comment);
 		}
 
@@ -53,7 +57,7 @@ public class CommitUtils {
 	 * @return Issue type.
 	 */
 	public static IssueType getIssueTypeFromPullRequestLabels(List<String> labels) {
-		return labels.stream().map(label -> getIssueType(label)).filter(t -> t != null).findFirst().orElse(null);
+		return labels.stream().map(CommitUtils::getIssueType).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
 	/**
@@ -64,20 +68,18 @@ public class CommitUtils {
 	 */
 	public static IssueType getIssueTypeFromCommitComment(String comment) {
 		if (comment.indexOf(MERGED_TEXT) >= 0) {
-			comment = comment.substring(comment.indexOf(":") + 1);
+			comment = comment.substring(comment.indexOf(':') + 1);
 		}
 
-		if (comment.indexOf(":") >= 0) {
-			comment = comment.substring(0, comment.indexOf(":"));
+		if (comment.indexOf(':') >= 0) {
+			comment = comment.substring(0, comment.indexOf(':'));
 
-			if (comment.indexOf("(") >= 0) {
-				comment = comment.substring(0, comment.indexOf("("));
+			if (comment.indexOf('(') >= 0) {
+				comment = comment.substring(0, comment.indexOf('('));
 			}
 		}
 
-		String type = comment.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-
-		return getIssueType(type);
+		return getIssueType(allTrim(comment));
 	}
 
 	/**
@@ -99,21 +101,18 @@ public class CommitUtils {
 	 */
 	public static String getFormmatedMessageFromCommitComment(String comment) {
 		if (comment.indexOf(MERGED_TEXT) >= 0) {
-			comment = comment.substring(comment.indexOf(":") + 1);
+			comment = comment.substring(comment.indexOf(':') + 1);
 		}
 
-		if (comment.indexOf(":") >= 0) {
-			comment = comment.substring(comment.indexOf(":") + 1);
+		if (comment.indexOf(':') >= 0) {
+			comment = comment.substring(comment.indexOf(':') + 1);
 		}
 
 		if (comment.substring(comment.length() - 1).equals(")")) {
-			comment = comment.substring(0, comment.lastIndexOf("("));
+			comment = comment.substring(0, comment.lastIndexOf('('));
 		}
 
-		comment = comment.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-		comment = comment.substring(0, 1).toUpperCase() + comment.substring(1);
-
-		return comment;
+		return capitalizeFirstLetter(allTrim(comment));
 	}
 
 	/**
@@ -127,9 +126,7 @@ public class CommitUtils {
 			return null;
 		}
 
-		comment = comment.substring(comment.lastIndexOf("(") + 1, comment.lastIndexOf(")"));
-
-		return comment;
+		return comment.substring(comment.lastIndexOf('(') + 1, comment.lastIndexOf(')'));
 	}
 
 	/**
@@ -147,10 +144,17 @@ public class CommitUtils {
 		}
 
 		text = description.substring(description.indexOf(BREAKING_CHANGE_PREFIX) + BREAKING_CHANGE_PREFIX.length());
-		text = text.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-		text = text.substring(0, 1).toUpperCase() + text.substring(1);
+		text = capitalizeFirstLetter(allTrim(text));
 
 		return text;
+	}
+
+	private static String allTrim(String text) {
+		return text.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+	}
+
+	private static String capitalizeFirstLetter(String text) {
+		return text.substring(0, 1).toUpperCase() + text.substring(1);
 	}
 
 }

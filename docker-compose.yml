@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+
+  generator:
+    image: docker.totvs.io/tjfio/azure-release-notes-generator
+    volumes:
+      - ./resources:/resources
+    command: ["--spring.config.location=file:///resources/application.yml"]

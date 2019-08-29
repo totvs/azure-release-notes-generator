@@ -1,2 +1,4 @@
-FROM openjdk:11
-COPY target/azure-release-notes-generator.jar /
+FROM openjdk:12-alpine
+
+COPY entrypoint.sh target/azure-release-notes-generator.jar /
+ENTRYPOINT ["/entrypoint.sh"]

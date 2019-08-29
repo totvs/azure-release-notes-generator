@@ -37,7 +37,7 @@ public class AzureService {
 
 	public <T> T get(Class<T> returnType, String uri, Object... uriVariables) {
 		String url = BASE_URL + "/" + uri;
-		url += url.indexOf("?") >= 0 ? "&" : "?";
+		url += url.indexOf('?') >= 0 ? "&" : "?";
 		url += VERSION_URI;
 		Object[] args = Stream.concat(Arrays.stream(urlConfig), Arrays.stream(uriVariables)).toArray();
 		return this.restTemplate.getForObject(url, returnType, args);

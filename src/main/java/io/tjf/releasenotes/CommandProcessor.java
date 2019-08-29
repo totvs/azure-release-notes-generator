@@ -11,7 +11,7 @@ import io.tjf.releasenotes.generator.Generator;
 
 /**
  * {@link ApplicationRunner} that triggers the generation of the release notes
- * based on application arguments.
+ * by command line.
  *
  * @author Rubens dos Santos Filho
  */
