@@ -17,7 +17,7 @@ import io.tjf.releasenotes.properties.ApplicationProperties;
 public class Sections {
 
 	private static final List<Section> DEFAULT_SECTIONS;
-	private final List<Section> sections;
+	private final List<Section> sectionsList;
 
 	static {
 		List<Section> sections = new ArrayList<>();
@@ -31,7 +31,7 @@ public class Sections {
 	}
 
 	public Sections(ApplicationProperties properties) {
-		this.sections = adapt(properties.getSections());
+		sectionsList = adapt(properties.getSections());
 	}
 
 	private static void add(List<Section> sections, String title, String emoji, String... labels) {
@@ -52,13 +52,13 @@ public class Sections {
 
 	public Map<Section, List<PullRequestCommit>> collate(List<PullRequestCommit> commits) {
 		SortedMap<Section, List<PullRequestCommit>> collated = new TreeMap<>(
-				Comparator.comparing(this.sections::indexOf));
+				Comparator.comparing(sectionsList::indexOf));
 
 		for (PullRequestCommit commit : commits) {
 			Section section = getSection(commit);
 
 			if (section != null) {
-				collated.computeIfAbsent(section, (key) -> new ArrayList<>());
+				collated.computeIfAbsent(section, key -> new ArrayList<>());
 				collated.get(section).add(commit);
 			}
 		}
@@ -67,7 +67,7 @@ public class Sections {
 	}
 
 	private Section getSection(PullRequestCommit prCommit) {
-		return this.sections.stream().filter(section -> section.isMatchFor(prCommit)).findFirst().orElse(null);
+		return sectionsList.stream().filter(section -> section.isMatchFor(prCommit)).findFirst().orElse(null);
 	}
 
 }

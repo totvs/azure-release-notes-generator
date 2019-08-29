@@ -12,8 +12,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Validated
 @ConfigurationProperties(prefix = "releasenotes")
+@Getter
+@Setter
 public class ApplicationProperties {
 
 	/**
@@ -56,53 +61,11 @@ public class ApplicationProperties {
 	@NotEmpty
 	private final List<Release> releases = new ArrayList<>();
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setFile(String file) {
-		this.file = file;
-	}
-
-	public String getFile() {
-		return file;
-	}
-
-	public boolean getAppend() {
-		return append;
-	}
-
-	public void setAppend(boolean append) {
-		this.append = append;
-	}
-
-	public void setIssueLinkBaseUrl(String issueLinkBaseUrl) {
-		this.issueLinkBaseUrl = issueLinkBaseUrl;
-	}
-
-	public String getIssueLinkBaseUrl() {
-		return issueLinkBaseUrl;
-	}
-
-	public Azure getAzure() {
-		return azure;
-	}
-
-	public List<Section> getSections() {
-		return this.sections;
-	}
-
-	public List<Release> getReleases() {
-		return releases;
-	}
-
 	/**
 	 * Azure Devops properties
 	 */
+	@Getter
+	@Setter
 	public static class Azure {
 
 		/**
@@ -140,59 +103,13 @@ public class ApplicationProperties {
 		 */
 		private String branch = "master";
 
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public String getOrganization() {
-			return organization;
-		}
-
-		public void setOrganization(String organization) {
-			this.organization = organization;
-		}
-
-		public String getProject() {
-			return project;
-		}
-
-		public void setProject(String project) {
-			this.project = project;
-		}
-
-		public String getRepository() {
-			return repository;
-		}
-
-		public void setRepository(String repository) {
-			this.repository = repository;
-		}
-
-		public String getBranch() {
-			return branch;
-		}
-
-		public void setBranch(String branch) {
-			this.branch = branch;
-		}
-
 	}
 
 	/**
 	 * Releases properties.
 	 */
+	@Getter
+	@Setter
 	public static class Release {
 
 		/**
@@ -218,43 +135,13 @@ public class ApplicationProperties {
 		 */
 		private String branch;
 
-		public String getTitle() {
-			return title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
-
-		public LocalDateTime getFromDate() {
-			return fromDate;
-		}
-
-		public void setFromDate(LocalDateTime fromDate) {
-			this.fromDate = fromDate;
-		}
-
-		public LocalDateTime getToDate() {
-			return toDate;
-		}
-
-		public void setToDate(LocalDateTime toDate) {
-			this.toDate = toDate;
-		}
-
-		public String getBranch() {
-			return branch;
-		}
-
-		public void setBranch(String branch) {
-			this.branch = branch;
-		}
-
 	}
 
 	/**
 	 * Release notes sections properties.
 	 */
+	@Getter
+	@Setter
 	public static class Section {
 
 		/**
@@ -274,30 +161,6 @@ public class ApplicationProperties {
 		 */
 		@NotEmpty
 		private List<String> labels = new ArrayList<>();
-
-		public String getTitle() {
-			return this.title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
-
-		public String getEmoji() {
-			return this.emoji;
-		}
-
-		public void setEmoji(String emoji) {
-			this.emoji = emoji;
-		}
-
-		public List<String> getLabels() {
-			return this.labels;
-		}
-
-		public void setLabels(List<String> labels) {
-			this.labels = labels;
-		}
 
 	}
 

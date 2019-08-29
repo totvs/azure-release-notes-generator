@@ -17,6 +17,7 @@ To generate the markdown file is necessary to configure your application propert
 ```yml
 releasenotes:
   title: Release Notes *
+  append: false
   file: /tmp/CHANGELOG.md *
   issue-link-base-url: https://dev.azure.com/foo/_workitems/edit *
   azure:

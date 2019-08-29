@@ -6,7 +6,11 @@ import java.util.List;
 import io.tjf.releasenotes.helper.CommitUtils;
 import io.tjf.releasenotes.helper.IssueType;
 import io.tjf.releasenotes.helper.PullRequestCommit;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public class Section {
 
 	private final String title;
@@ -15,24 +19,6 @@ public class Section {
 
 	public Section(String title, String emoji, String... labels) {
 		this(title, emoji, Arrays.asList(labels));
-	}
-
-	public Section(String title, String emoji, List<String> labels) {
-		this.title = title;
-		this.emoji = emoji;
-		this.labels = labels;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public String getEmoji() {
-		return emoji;
-	}
-
-	public List<String> getLabels() {
-		return labels;
 	}
 
 	public boolean isMatchFor(PullRequestCommit prCommit) {

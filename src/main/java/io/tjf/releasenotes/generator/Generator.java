@@ -39,8 +39,7 @@ public class Generator {
 		String defaultBranch = this.properties.getAzure().getBranch();
 
 		StringBuilder content = new StringBuilder();
-		content.append("# " + properties.getTitle());
-		content.append(DOUBLE_BREAK_LINE);
+		content.append("# ").append(properties.getTitle()).append(DOUBLE_BREAK_LINE);
 
 		for (ApplicationProperties.Release release : this.properties.getReleases()) {
 			String branch = release.getBranch();
@@ -55,9 +54,8 @@ public class Generator {
 			// Build the map with the release sections.
 			Map<Section, List<PullRequestCommit>> releaseSections = this.sections.collate(commits);
 
-			content.append("## " + release.getTitle());
-			content.append(generateSectionContent(releaseSections));
-			content.append(content.length() > 0 ? HORIZONTAL_RULE : "");
+			content.append("## ").append(release.getTitle());
+			content.append(generateSectionContent(releaseSections)).append(HORIZONTAL_RULE);
 		}
 
 		writeContentToFile(content.toString(), this.properties.getFile());
@@ -70,7 +68,7 @@ public class Generator {
 
 		releaseSections.forEach((section, commits) -> {
 			content.append(BREAK_LINE);
-			content.append("### " + section.toString() + DOUBLE_BREAK_LINE);
+			content.append("### ").append(section.toString()).append(DOUBLE_BREAK_LINE);
 			commits.stream().map(this::getFormmatedCommitMessage).forEach(content::append);
 		});
 
@@ -104,9 +102,9 @@ public class Generator {
 		File file = new File(path);
 
 		// Append the file content.
-		if (file.exists()) {
+		if (properties.isAppend() && file.exists()) {
 			Stream<String> lines = Files.lines(file.toPath());
-			content += lines.collect(Collectors.joining("\n"));
+			content += lines.collect(Collectors.joining(BREAK_LINE));
 			lines.close();
 		}
 
