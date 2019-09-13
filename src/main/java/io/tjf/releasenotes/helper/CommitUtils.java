@@ -123,7 +123,7 @@ public class CommitUtils {
 	 */
 	public static String getIssueFromCommitComment(String comment) {
 		if (!comment.substring(comment.length() - 1).equals(")")) {
-			return null;
+			return "";
 		}
 
 		return comment.substring(comment.lastIndexOf('(') + 1, comment.lastIndexOf(')'));
