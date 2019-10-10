@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import io.tjf.releasenotes.helper.PullRequestCommit;
+import io.tjf.releasenotes.helper.ConventionalCommit;
 import io.tjf.releasenotes.properties.ApplicationProperties;
 
 public class Sections {
@@ -50,11 +50,11 @@ public class Sections {
 		return new Section(propertySection.getTitle(), propertySection.getEmoji(), propertySection.getLabels());
 	}
 
-	public Map<Section, List<PullRequestCommit>> collate(List<PullRequestCommit> commits) {
-		SortedMap<Section, List<PullRequestCommit>> collated = new TreeMap<>(
+	public Map<Section, List<ConventionalCommit>> collate(List<ConventionalCommit> commits) {
+		SortedMap<Section, List<ConventionalCommit>> collated = new TreeMap<>(
 				Comparator.comparing(sectionsList::indexOf));
 
-		for (PullRequestCommit commit : commits) {
+		for (ConventionalCommit commit : commits) {
 			Section section = getSection(commit);
 
 			if (section != null) {
@@ -66,7 +66,7 @@ public class Sections {
 		return collated;
 	}
 
-	private Section getSection(PullRequestCommit prCommit) {
+	private Section getSection(ConventionalCommit prCommit) {
 		return sectionsList.stream().filter(section -> section.isMatchFor(prCommit)).findFirst().orElse(null);
 	}
 

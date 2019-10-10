@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PullRequestCommit {
+public class ConventionalCommit {
 
 	private final int pullRequestId;
 	private final IssueType issueType;

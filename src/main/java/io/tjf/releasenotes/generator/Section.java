@@ -5,7 +5,7 @@ import java.util.List;
 
 import io.tjf.releasenotes.helper.CommitUtils;
 import io.tjf.releasenotes.helper.IssueType;
-import io.tjf.releasenotes.helper.PullRequestCommit;
+import io.tjf.releasenotes.helper.ConventionalCommit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,7 +21,7 @@ public class Section {
 		this(title, emoji, Arrays.asList(labels));
 	}
 
-	public boolean isMatchFor(PullRequestCommit prCommit) {
+	public boolean isMatchFor(ConventionalCommit prCommit) {
 		IssueType issueType = CommitUtils.getIssueTypeFromCommitComment(prCommit.getCommit().getComment());
 		return labels.stream().anyMatch(label -> issueType != null && issueType.name().equalsIgnoreCase(label));
 	}

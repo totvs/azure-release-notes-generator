@@ -1,0 +1,29 @@
+releasenotes:
+  file: /tmp/CHANGELOG.md
+  issue-link-base-url: http://jiraproducao.totvs.com.br/browse
+  title: Release Notes
+  append: true
+  azure:
+    organization: totvstfs
+    project: TJF
+    repository: TJF
+    username: anything
+    password: ehzszjwcag37s3iyt5g7k7erm7v5x57g4fgtiq7cqsydltujmpsa
+  sections:
+  - title: Novas funcionalidades
+    emoji: ":star:"
+    labels: feat, test, perf
+  - title: Correções de bugs
+    emoji: ":beetle:"
+    labels: fix, bug
+  - title: Documentação
+    emoji: ":notebook_with_decorative_cover:"
+    labels: doc, docs, style, chore
+  - title: Refatorações
+    emoji: ":wrench:"
+    labels: refactor
+  releases:
+  - title: 1.6.2-RELEASE
+    fromDate: 2019-10-01T00:00:00
+    toDate: 2019-10-09T23:59:59
+    branch: develop

@@ -15,7 +15,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
 import io.tjf.releasenotes.azure.service.CommitService;
-import io.tjf.releasenotes.helper.PullRequestCommit;
+import io.tjf.releasenotes.helper.ConventionalCommit;
 import io.tjf.releasenotes.properties.ApplicationProperties;
 
 @Configuration
@@ -49,10 +49,10 @@ public class Generator {
 			LocalDateTime toDate = release.getToDate();
 
 			// Get the pull request commits from this release.
-			List<PullRequestCommit> commits = this.service.getPullRequestCommitsFromPeriod(fromDate, toDate, branch);
+			List<ConventionalCommit> commits = this.service.getConventionalCommitsFromPeriod(fromDate, toDate, branch);
 
 			// Build the map with the release sections.
-			Map<Section, List<PullRequestCommit>> releaseSections = this.sections.collate(commits);
+			Map<Section, List<ConventionalCommit>> releaseSections = this.sections.collate(commits);
 
 			content.append("## ").append(release.getTitle());
 			content.append(generateSectionContent(releaseSections)).append(HORIZONTAL_RULE);
@@ -61,7 +61,7 @@ public class Generator {
 		writeContentToFile(content.toString(), this.properties.getFile());
 	}
 
-	private StringBuilder generateSectionContent(Map<Section, List<PullRequestCommit>> releaseSections) {
+	private StringBuilder generateSectionContent(Map<Section, List<ConventionalCommit>> releaseSections) {
 		StringBuilder content = new StringBuilder();
 
 		content.append(BREAK_LINE);
@@ -75,7 +75,7 @@ public class Generator {
 		return content;
 	}
 
-	private String getFormmatedCommitMessage(PullRequestCommit prCommit) {
+	private String getFormmatedCommitMessage(ConventionalCommit prCommit) {
 		String message = "";
 		String issue = prCommit.getIssue();
 		String issueLink = "";

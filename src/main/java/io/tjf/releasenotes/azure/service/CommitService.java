@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import io.tjf.releasenotes.azure.payload.Commit;
 import io.tjf.releasenotes.azure.payload.Result;
 import io.tjf.releasenotes.helper.CommitUtils;
+import io.tjf.releasenotes.helper.ConventionalCommit;
 import io.tjf.releasenotes.helper.IssueType;
-import io.tjf.releasenotes.helper.PullRequestCommit;
 import io.tjf.releasenotes.properties.ApplicationProperties;
 
 /**
@@ -49,61 +49,75 @@ public class CommitService extends AzureService {
 	}
 
 	/**
-	 * Returns all pull requests commits from the given period and branch.
+	 * Returns all convetional commits from the given period and branch.
 	 * 
 	 * @param fromDate Commit start date.
 	 * @param toDate   Commit end date.
 	 * @param branch   Branch name.
 	 * 
-	 * @return List of pull requests commits.
+	 * @return List of {@link ConventionalCommit}.
 	 */
-	public List<PullRequestCommit> getPullRequestCommitsFromPeriod(LocalDateTime fromDate, LocalDateTime toDate,
+	public List<ConventionalCommit> getConventionalCommitsFromPeriod(LocalDateTime fromDate, LocalDateTime toDate,
 			String branch) {
-		return getFormattedPullRequestCommits(getCommitsFromPeriod(fromDate, toDate, branch));
+		List<Commit> commits = getCommitsFromPeriod(fromDate, toDate, branch);
+		List<Commit> prCommits = CommitUtils.filterPullRequestCommits(commits);
+
+		// If the given period had PR, use them to get the convetional commits.
+		if (!prCommits.isEmpty()) {
+			return getConventionalCommitsFromCommits(prCommits);
+		}
+
+		// Otherwise use all the finded commits.
+		return getConventionalCommitsFromCommits(commits);
 	}
 
 	/**
-	 * Filters and converts pull requests commits only.
+	 * Loads all conventional commits from the finded pull requests commits.
 	 * 
-	 * @param result Commit result object.
-	 * @return List of pull requests commits.
+	 * @param result List of pull requests commits.
+	 * @return List of {@link ConventionalCommit}.
 	 */
-	public List<PullRequestCommit> getFormattedPullRequestCommits(List<Commit> commits) {
-		List<PullRequestCommit> pullRequests = new ArrayList<>();
+	public List<ConventionalCommit> getConventionalCommitsFromCommits(List<Commit> commits) {
+		List<ConventionalCommit> conventionalCommits = new ArrayList<>();
 
-		// Filter for pull requests only.
-		addFormmatedPullRequestCommit(pullRequests, commits);
-
-		return pullRequests;
-	}
-
-	private void addFormmatedPullRequestCommit(List<PullRequestCommit> pullRequests, List<Commit> commits) {
 		for (Commit commit : commits) {
-			var comment = commit.getComment();
+			ConventionalCommit conventionalCommit = getConventionalCommit(commit);
 
-			var pullRequestId = CommitUtils.getPullRequestIdFromCommitComment(comment);
-			List<String> labels = getPullRequestLabels(pullRequestId);
-
-			if (hasSkipLabelOrComment(labels, comment)) {
-				continue;
-			}
-
-			var issueType = getIssueTypeFromPullRequestLabelsOrFromCommitComment(labels, comment);
-
-			if (issueType != null) {
-				var issue = CommitUtils.getIssueFromCommitComment(comment);
-
-				if (pullRequestListAlreadyHasIssue(pullRequests, issue)) {
-					continue;
+			if (conventionalCommit != null) {
+				boolean hasIssue = conventionalCommits.stream()
+						.anyMatch(c -> c.getIssue().equals(conventionalCommit.getIssue()));
+				
+				if (!hasIssue) {
+					conventionalCommits.add(conventionalCommit);
 				}
-
-				var message = CommitUtils.getFormmatedMessageFromCommitComment(comment);
-				var description = getPullRequestDescription(pullRequestId);
-				var breaking = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
-
-				pullRequests.add(new PullRequestCommit(pullRequestId, issueType, issue, message, breaking, commit));
 			}
 		}
+
+		return conventionalCommits;
+	}
+
+	private ConventionalCommit getConventionalCommit(Commit commit) {
+		var comment = commit.getComment();
+		var pullRequestId = CommitUtils.getPullRequestIdFromCommitComment(comment);
+
+		List<String> labels = getPullRequestLabels(pullRequestId);
+
+		if (hasSkipLabelOrComment(labels, comment)) {
+			return null;
+		}
+
+		var issueType = getIssueTypeFromPullRequestLabelsOrFromCommitComment(labels, comment);
+
+		if (issueType == null) {
+			return null;
+		}
+
+		var issue = CommitUtils.getIssueFromCommitComment(comment);
+		var message = CommitUtils.getFormmatedMessageFromCommitComment(comment);
+		var description = getPullRequestDescription(pullRequestId);
+		var breaking = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
+
+		return new ConventionalCommit(pullRequestId, issueType, issue, message, breaking, commit);
 	}
 
 	private boolean isValidPullRequestId(int pullRequestId) {
@@ -111,7 +125,7 @@ public class CommitService extends AzureService {
 	}
 
 	private List<String> getPullRequestLabels(int pullRequestId) {
-		if (isValidPullRequestId(pullRequestId)) {
+		if (!isValidPullRequestId(pullRequestId)) {
 			return Collections.emptyList();
 		}
 
@@ -135,20 +149,15 @@ public class CommitService extends AzureService {
 	}
 
 	private boolean hasSkipLabelOrComment(List<String> labels, String comment) {
-		return labels.contains("skip") || comment.endsWith("[skip]");
+		return hasSkipLabel(labels) || hasSkipComment(comment);
 	}
 
-	private boolean pullRequestListAlreadyHasIssue(List<PullRequestCommit> pullRequests, String issue) {
-		boolean hasIssue = false;
+	private boolean hasSkipLabel(List<String> labels) {
+		return labels.contains("skip");
+	}
 
-		for (PullRequestCommit pullRequest : pullRequests) {
-			if (pullRequest.getIssue().equals(issue)) {
-				hasIssue = true;
-				break;
-			}
-		}
-
-		return hasIssue;
+	private boolean hasSkipComment(String comment) {
+		return comment.endsWith("[skip]");
 	}
 
 	public static class CommitResult extends Result<Commit> {
