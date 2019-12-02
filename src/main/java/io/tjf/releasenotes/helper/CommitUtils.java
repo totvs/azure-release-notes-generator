@@ -67,6 +67,8 @@ public class CommitUtils {
 	 * @return Issue type.
 	 */
 	public static IssueType getIssueTypeFromCommitComment(String comment) {
+		IssueType issueType = null;
+
 		if (comment.indexOf(MERGED_TEXT) >= 0) {
 			comment = comment.substring(comment.indexOf(':') + 1);
 		}
@@ -77,9 +79,29 @@ public class CommitUtils {
 			if (comment.indexOf('(') >= 0) {
 				comment = comment.substring(0, comment.indexOf('('));
 			}
+
+			issueType = getIssueType(allTrim(comment));
 		}
 
-		return getIssueType(allTrim(comment));
+		return issueType;
+	}
+
+	public static String getComponentFromCommitComment(String comment) {
+		String component = "";
+
+		if (comment.indexOf(MERGED_TEXT) >= 0) {
+			comment = comment.substring(comment.indexOf(':') + 1);
+		}
+
+		if (comment.indexOf(':') >= 0) {
+			comment = comment.substring(0, comment.indexOf(':'));
+
+			if (comment.indexOf('(') >= 0) {
+				component = comment.substring(comment.indexOf('(') + 1, comment.indexOf(')'));
+			}
+		}
+
+		return component;
 	}
 
 	/**

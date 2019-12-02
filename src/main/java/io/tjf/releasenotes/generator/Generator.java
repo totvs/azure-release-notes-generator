@@ -76,16 +76,23 @@ public class Generator {
 	}
 
 	private String getFormmatedCommitMessage(ConventionalCommit prCommit) {
-		String message = "";
+		String message = "- ";
+
 		String issue = prCommit.getIssue();
-		String issueLink = "";
+		String component = prCommit.getComponent();
 		String breakingChange = prCommit.getBreakingChange();
 
-		if (!StringUtils.isEmpty(issue)) {
-			issueLink = " (" + getLinkToIssue(issue) + ")";
+		if (!StringUtils.isEmpty(component)) {
+			message += component + ": ";
 		}
 
-		message = "- " + prCommit.getMessage() + issueLink + BREAK_LINE;
+		message += prCommit.getMessage();
+
+		if (!StringUtils.isEmpty(issue)) {
+			message += " (" + getLinkToIssue(issue) + ")";
+		}
+
+		message += BREAK_LINE;
 
 		if (!StringUtils.isEmpty(breakingChange)) {
 			message += "    * :warning: **BREAKING CHANGE:** " + breakingChange + BREAK_LINE;

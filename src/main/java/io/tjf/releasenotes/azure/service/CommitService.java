@@ -113,11 +113,12 @@ public class CommitService extends AzureService {
 		}
 
 		var issue = CommitUtils.getIssueFromCommitComment(comment);
+		var component = CommitUtils.getComponentFromCommitComment(comment);
 		var message = CommitUtils.getFormmatedMessageFromCommitComment(comment);
 		var description = getPullRequestDescription(pullRequestId);
 		var breaking = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
 
-		return new ConventionalCommit(pullRequestId, issueType, issue, message, breaking, commit);
+		return new ConventionalCommit(pullRequestId, issueType, issue, component, message, breaking, commit);
 	}
 
 	private boolean isValidPullRequestId(int pullRequestId) {
