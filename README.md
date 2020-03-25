@@ -1,8 +1,10 @@
 # azure-release-notes-generator
 
-A release notes generator based on Azure DevOps commits (aka VSTS) based on [Spring's GitHub Release Notes Generator][github-generator].
+A release notes generator based on Azure DevOps commits using the [Conventional Commits](https://www.conventionalcommits.org) specification.
 
 The release notes markdown file is generated base on the commits pushed to a determinated branch and period.
+
+> This project was based on [Spring's GitHub Release Notes Generator][github-generator]
 
 ## Getting started
 
