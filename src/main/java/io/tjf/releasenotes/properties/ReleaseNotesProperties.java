@@ -15,11 +15,11 @@ import org.springframework.validation.annotation.Validated;
 import lombok.Getter;
 import lombok.Setter;
 
-@Validated
-@ConfigurationProperties(prefix = "releasenotes")
 @Getter
 @Setter
-public class ApplicationProperties {
+@ConfigurationProperties(prefix = "releasenotes")
+@Validated
+public class ReleaseNotesProperties {
 
 	/**
 	 * Document title.
@@ -34,7 +34,7 @@ public class ApplicationProperties {
 	private String file;
 
 	/**
-	 * true to append file content.
+	 * {@code true} to append the content into the file.
 	 */
 	private boolean append = false;
 
@@ -46,7 +46,7 @@ public class ApplicationProperties {
 	private String issueLinkBaseUrl;
 
 	/**
-	 * Azure Devops properties.
+	 * Azure properties.
 	 */
 	private final Azure azure = new Azure();
 
@@ -61,8 +61,15 @@ public class ApplicationProperties {
 	@NotEmpty
 	private final List<Release> releases = new ArrayList<>();
 
+	public String getPullRequestLinkBaseUrl() {
+		var organization = getAzure().getOrganization();
+		var project = getAzure().getProject();
+		var repository = getAzure().getRepository();
+		return String.format("https://%s.visualstudio.com/%s/_git/%s/pullrequest", organization, project, repository);
+	}
+
 	/**
-	 * Azure Devops properties
+	 * Azure properties
 	 */
 	@Getter
 	@Setter
@@ -81,7 +88,7 @@ public class ApplicationProperties {
 		private String password;
 
 		/**
-		 * Azure instance name.
+		 * Azure organization name.
 		 */
 		@NotBlank
 		private String organization;

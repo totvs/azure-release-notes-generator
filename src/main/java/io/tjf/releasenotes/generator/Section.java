@@ -3,14 +3,12 @@ package io.tjf.releasenotes.generator;
 import java.util.Arrays;
 import java.util.List;
 
-import io.tjf.releasenotes.helper.CommitUtils;
 import io.tjf.releasenotes.helper.IssueType;
-import io.tjf.releasenotes.helper.ConventionalCommit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor(staticName = "of")
 @Getter
-@AllArgsConstructor
 public class Section {
 
 	private final String title;
@@ -21,9 +19,8 @@ public class Section {
 		this(title, emoji, Arrays.asList(labels));
 	}
 
-	public boolean isMatchFor(ConventionalCommit prCommit) {
-		IssueType issueType = CommitUtils.getIssueTypeFromCommitComment(prCommit.getCommit().getComment());
-		return labels.stream().anyMatch(label -> issueType != null && issueType.name().equalsIgnoreCase(label));
+	public boolean isMatchFor(IssueType issueType) {
+		return labels.stream().anyMatch(label -> issueType.name().equalsIgnoreCase(label));
 	}
 
 	@Override

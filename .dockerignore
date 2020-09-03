@@ -1,0 +1,19 @@
+# git
+.git/
+.gitignore
+
+# maven
+**/target/
+
+# eclipse
+**/.settings/
+**/.classpath
+**/.project
+
+# docker
+.dockerignore
+Dockerfile
+
+# others
+src/main/resources
+*.md

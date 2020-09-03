@@ -4,23 +4,24 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import io.tjf.releasenotes.azure.payload.Commit;
 import io.tjf.releasenotes.azure.payload.Result;
 import io.tjf.releasenotes.helper.CommitUtils;
 import io.tjf.releasenotes.helper.ConventionalCommit;
 import io.tjf.releasenotes.helper.IssueType;
-import io.tjf.releasenotes.properties.ApplicationProperties;
+import io.tjf.releasenotes.properties.ReleaseNotesProperties;
 
 /**
  * Azure Commit REST API interactive class.
  * 
  * @author Rubens dos Santos Filho
  */
-@Component
+@Service
 public class CommitService extends AzureService {
 
 	private static final String COMMIT_URI = "commits";
@@ -29,19 +30,20 @@ public class CommitService extends AzureService {
 
 	private final PullRequestService pullRequestService;
 
-	public CommitService(RestTemplateBuilder builder, ApplicationProperties properties,
-			PullRequestService pullRequestService) {
+	public CommitService(final RestTemplateBuilder builder, final ReleaseNotesProperties properties,
+			final PullRequestService pullRequestService) {
 		super(builder, properties);
 		this.pullRequestService = pullRequestService;
 	}
 
 	/**
-	 * Returns all commits from the given period and branch.
+	 * Return all commits from the given branch and period.
 	 * 
-	 * @param fromDate Commit start date.
-	 * @param toDate   Commit end date.
-	 * @param branch   Branch name.
-	 * @return List of commits.
+	 * @param fromDate commit start date
+	 * @param toDate   commit end date
+	 * @param branch   branch name
+	 * 
+	 * @return list of commits
 	 */
 	public List<Commit> getCommitsFromPeriod(LocalDateTime fromDate, LocalDateTime toDate, String branch) {
 		var url = COMMIT_URI + "?" + COMMIT_PERIOD_URI + "&" + COMMIT_TYPE_URI;
@@ -49,47 +51,41 @@ public class CommitService extends AzureService {
 	}
 
 	/**
-	 * Returns all convetional commits from the given period and branch.
+	 * Return all conventional commits from the given period and branch.
 	 * 
-	 * @param fromDate Commit start date.
-	 * @param toDate   Commit end date.
-	 * @param branch   Branch name.
+	 * @param fromDate commit start date
+	 * @param toDate   commit end date
+	 * @param branch   branch name
 	 * 
-	 * @return List of {@link ConventionalCommit}.
+	 * @return list of {@link ConventionalCommit}
 	 */
-	public List<ConventionalCommit> getConventionalCommitsFromPeriod(LocalDateTime fromDate, LocalDateTime toDate,
-			String branch) {
+	public List<ConventionalCommit> getConventionalCommitsFromPeriod(final LocalDateTime fromDate,
+			final LocalDateTime toDate, final String branch) {
 		List<Commit> commits = getCommitsFromPeriod(fromDate, toDate, branch);
 		List<Commit> prCommits = CommitUtils.filterPullRequestCommits(commits);
 
-		// If the given period had PR, use them to get the convetional commits.
-		if (!prCommits.isEmpty()) {
+		// If the given period had PR, use them to get the conventional commits.
+		// This is necessary because the PR REST API doesn't have a way to
+		// filter commits by period.
+		if (!prCommits.isEmpty())
 			return getConventionalCommitsFromCommits(prCommits);
-		}
 
-		// Otherwise use all the finded commits.
+		// Otherwise use all the found commits.
 		return getConventionalCommitsFromCommits(commits);
 	}
 
-	/**
-	 * Loads all conventional commits from the finded pull requests commits.
-	 * 
-	 * @param result List of pull requests commits.
-	 * @return List of {@link ConventionalCommit}.
-	 */
-	public List<ConventionalCommit> getConventionalCommitsFromCommits(List<Commit> commits) {
+	private List<ConventionalCommit> getConventionalCommitsFromCommits(final List<Commit> commits) {
 		List<ConventionalCommit> conventionalCommits = new ArrayList<>();
 
 		for (Commit commit : commits) {
 			ConventionalCommit conventionalCommit = getConventionalCommit(commit);
 
 			if (conventionalCommit != null) {
-				boolean hasIssue = conventionalCommits.stream()
+				var hasIssue = conventionalCommits.stream()
 						.anyMatch(c -> c.getIssue().equals(conventionalCommit.getIssue()));
-				
-				if (!hasIssue) {
+
+				if (!hasIssue)
 					conventionalCommits.add(conventionalCommit);
-				}
 			}
 		}
 
@@ -102,49 +98,40 @@ public class CommitService extends AzureService {
 
 		List<String> labels = getPullRequestLabels(pullRequestId);
 
-		if (hasSkipLabelOrComment(labels, comment)) {
+		if (hasSkipLabelOrComment(labels, comment))
 			return null;
-		}
 
 		var issueType = getIssueTypeFromPullRequestLabelsOrFromCommitComment(labels, comment);
 
-		if (issueType == null) {
+		if (issueType == null)
 			return null;
-		}
 
 		var issue = CommitUtils.getIssueFromCommitComment(comment);
 		var component = CommitUtils.getComponentFromCommitComment(comment);
 		var message = CommitUtils.getFormmatedMessageFromCommitComment(comment);
 		var description = getPullRequestDescription(pullRequestId);
-		var breaking = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
+		var breakingChange = CommitUtils.getFormmatedBreakingChangeTextFromPullRequestDescription(description);
 
-		return new ConventionalCommit(pullRequestId, issueType, issue, component, message, breaking, commit);
-	}
-
-	private boolean isValidPullRequestId(int pullRequestId) {
-		return pullRequestId != -1;
+		return ConventionalCommit.of(pullRequestId, issueType, issue, component, message, breakingChange);
 	}
 
 	private List<String> getPullRequestLabels(int pullRequestId) {
-		if (!isValidPullRequestId(pullRequestId)) {
+		if (!CommitUtils.isPullRequestIdValid(pullRequestId))
 			return Collections.emptyList();
-		}
 
 		return pullRequestService.getPullRequestLabelsNames(pullRequestId);
 	}
 
 	private String getPullRequestDescription(int pullRequestId) {
-		if (isValidPullRequestId(pullRequestId)) {
+		if (!CommitUtils.isPullRequestIdValid(pullRequestId))
 			return "";
-		}
 
 		return pullRequestService.getPullRequest(pullRequestId).getDescription();
 	}
 
 	private IssueType getIssueTypeFromPullRequestLabelsOrFromCommitComment(List<String> labels, String comment) {
-		if (!labels.isEmpty()) {
+		if (!labels.isEmpty())
 			return CommitUtils.getIssueTypeFromPullRequestLabels(labels);
-		}
 
 		return CommitUtils.getIssueTypeFromCommitComment(comment);
 	}
@@ -154,15 +141,15 @@ public class CommitService extends AzureService {
 	}
 
 	private boolean hasSkipLabel(List<String> labels) {
-		return labels.contains("skip");
+		return labels.stream().map(String::toLowerCase).collect(Collectors.toList()).contains("skip");
 	}
 
 	private boolean hasSkipComment(String comment) {
-		return comment.endsWith("[skip]");
+		return comment.toLowerCase().contains("skip:");
 	}
 
 	public static class CommitResult extends Result<Commit> {
-		public CommitResult(int count, List<Commit> value) {
+		public CommitResult(final int count, final List<Commit> value) {
 			super(count, value);
 		}
 	}

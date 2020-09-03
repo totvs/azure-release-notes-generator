@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Represents the Azure Git pull request.
+ * Represents a pull request structure.
  * 
  * @author Rubens dos Santos Filho
  */
+@AllArgsConstructor(staticName = "of")
 @Getter
-@AllArgsConstructor
 public class PullRequest {
 
 	private final int pullRequestId;
