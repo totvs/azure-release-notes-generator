@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
 
 import io.tjf.releasenotes.helper.ConventionalCommit;
-import io.tjf.releasenotes.properties.ApplicationProperties;
+import io.tjf.releasenotes.properties.ReleaseNotesProperties;
 
 public class Sections {
 
@@ -30,27 +30,27 @@ public class Sections {
 		DEFAULT_SECTIONS = Collections.unmodifiableList(sections);
 	}
 
-	public Sections(ApplicationProperties properties) {
+	public Sections(final ReleaseNotesProperties properties) {
 		sectionsList = adapt(properties.getSections());
 	}
 
-	private static void add(List<Section> sections, String title, String emoji, String... labels) {
+	private static void add(final List<Section> sections, final String title, final String emoji,
+			final String... labels) {
 		sections.add(new Section(title, emoji, labels));
 	}
 
-	private List<Section> adapt(List<ApplicationProperties.Section> propertySections) {
-		if (CollectionUtils.isEmpty(propertySections)) {
+	private List<Section> adapt(final List<ReleaseNotesProperties.Section> propertySections) {
+		if (CollectionUtils.isEmpty(propertySections))
 			return DEFAULT_SECTIONS;
-		}
 
 		return propertySections.stream().map(this::adapt).collect(Collectors.toList());
 	}
 
-	private Section adapt(ApplicationProperties.Section propertySection) {
-		return new Section(propertySection.getTitle(), propertySection.getEmoji(), propertySection.getLabels());
+	private Section adapt(final ReleaseNotesProperties.Section propertySection) {
+		return Section.of(propertySection.getTitle(), propertySection.getEmoji(), propertySection.getLabels());
 	}
 
-	public Map<Section, List<ConventionalCommit>> collate(List<ConventionalCommit> commits) {
+	public Map<Section, List<ConventionalCommit>> collate(final List<ConventionalCommit> commits) {
 		SortedMap<Section, List<ConventionalCommit>> collated = new TreeMap<>(
 				Comparator.comparing(sectionsList::indexOf));
 
@@ -67,7 +67,8 @@ public class Sections {
 	}
 
 	private Section getSection(ConventionalCommit prCommit) {
-		return sectionsList.stream().filter(section -> section.isMatchFor(prCommit)).findFirst().orElse(null);
+		return sectionsList.stream().filter(section -> section.isMatchFor(prCommit.getIssueType())).findFirst()
+				.orElse(null);
 	}
 
 }

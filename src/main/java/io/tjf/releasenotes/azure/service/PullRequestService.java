@@ -4,78 +4,63 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import io.tjf.releasenotes.azure.payload.Commit;
 import io.tjf.releasenotes.azure.payload.Label;
 import io.tjf.releasenotes.azure.payload.PullRequest;
 import io.tjf.releasenotes.azure.payload.Result;
-import io.tjf.releasenotes.azure.service.CommitService.CommitResult;
-import io.tjf.releasenotes.properties.ApplicationProperties;
+import io.tjf.releasenotes.properties.ReleaseNotesProperties;
 
 /**
  * Azure Pull Request REST API interactive class.
  * 
  * @author Rubens dos Santos Filho
  */
-@Component
+@Service
 public class PullRequestService extends AzureService {
 
 	private static final String PR_BASE_URI = "pullRequests";
 	private static final String PR_URI = PR_BASE_URI + "/{pullRequestId}";
-	private static final String PR_COMMITS_URI = PR_URI + "/commits";
 	private static final String PR_LABELS_URI = PR_URI + "/labels";
 
-	public PullRequestService(RestTemplateBuilder builder, ApplicationProperties properties) {
+	public PullRequestService(final RestTemplateBuilder builder, final ReleaseNotesProperties properties) {
 		super(builder, properties);
 	}
 
 	/**
 	 * Return the pull request information.
 	 * 
-	 * @param pullRequestId Pull request id.
-	 * @return Pull request object.
+	 * @param pullRequestId pull request id
+	 * @return pull request object
 	 */
-	public PullRequest getPullRequest(int pullRequestId) {
+	public PullRequest getPullRequest(final int pullRequestId) {
 		return get(PullRequest.class, PR_URI, pullRequestId);
 	}
 
 	/**
-	 * Returns all commits from the informed pull request.
+	 * Return all pull request labels.
 	 * 
-	 * @param pullRequestId Pull request id.
-	 * @return List of pull request commits.
-	 */
-	public List<Commit> getPullRequestCommits(int pullRequestId) {
-		return get(CommitResult.class, PR_COMMITS_URI, pullRequestId).getValue();
-	}
-
-	/**
-	 * Returns all pull request labels.
-	 * 
-	 * @param pullRequestId Pull request id.
-	 * @return List of pull request labels.
+	 * @param pullRequestId pull request id
+	 * @return list of pull request labels
 	 */
 	public List<Label> getPullRequestLabels(int pullRequestId) {
 		return get(PullRequestLabelsResult.class, PR_LABELS_URI, pullRequestId).getValue();
 	}
 
 	/**
-	 * Returns all pull request labels names.
+	 * Return all pull request labels names.
 	 * 
-	 * @param pullRequestId Pull request id.
-	 * @return List of pull request labels names.
+	 * @param pullRequestId pull request id
+	 * @return list of pull request labels names
 	 */
 	public List<String> getPullRequestLabelsNames(int pullRequestId) {
-		return getPullRequestLabels(pullRequestId).stream().map(label -> label.getName()).collect(Collectors.toList());
+		return getPullRequestLabels(pullRequestId).stream().map(Label::getName).collect(Collectors.toList());
 	}
 
 	public static class PullRequestLabelsResult extends Result<Label> {
-
-		public PullRequestLabelsResult(int count, List<Label> value) {
+		public PullRequestLabelsResult(final int count, final List<Label> value) {
 			super(count, value);
 		}
-
 	}
 
 }

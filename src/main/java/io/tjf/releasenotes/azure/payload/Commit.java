@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Represents an Azure Git commit.
+ * Represents a git commit structure.
  * 
  * @author Rubens dos Santos Filho
  */
+@AllArgsConstructor(staticName = "of")
 @Getter
-@AllArgsConstructor
 public class Commit {
 
 	private final String commitId;

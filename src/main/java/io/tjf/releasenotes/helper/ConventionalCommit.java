@@ -1,11 +1,15 @@
 package io.tjf.releasenotes.helper;
 
-import io.tjf.releasenotes.azure.payload.Commit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Represents a conventional commit structure.
+ * 
+ * @author Rubens dos Santos Filho
+ */
+@AllArgsConstructor(staticName = "of")
 @Getter
-@AllArgsConstructor
 public class ConventionalCommit {
 
 	private final int pullRequestId;
@@ -14,6 +18,5 @@ public class ConventionalCommit {
 	private final String component;
 	private final String message;
 	private final String breakingChange;
-	private final Commit commit;
 
 }

@@ -1,13 +1,12 @@
 package io.tjf.releasenotes;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import io.tjf.releasenotes.generator.Generator;
+import io.tjf.releasenotes.generator.GeneratorService;
 
 /**
  * {@link ApplicationRunner} that triggers the generation of the release notes
@@ -18,18 +17,14 @@ import io.tjf.releasenotes.generator.Generator;
 @Component
 public class CommandProcessor implements ApplicationRunner {
 
-	private final Generator generator;
+	private final GeneratorService generator;
 
-	public CommandProcessor(Generator generator) {
+	public CommandProcessor(final GeneratorService generator) {
 		this.generator = generator;
 	}
 
 	@Override
-	public void run(ApplicationArguments args) throws IOException {
-		run(args.getNonOptionArgs());
-	}
-
-	private void run(List<String> args) throws IOException {
+	public void run(final ApplicationArguments args) throws IOException {
 		this.generator.generate();
 	}
 

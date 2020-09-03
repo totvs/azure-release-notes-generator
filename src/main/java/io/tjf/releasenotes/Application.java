@@ -4,15 +4,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import io.tjf.releasenotes.properties.ApplicationProperties;
+import io.tjf.releasenotes.properties.ReleaseNotesProperties;
 
 /**
- * Azure Devops release notes generator.
+ * Azure DevOps release notes generator.
  * 
  * @author Rubens dos Santos Filho
  */
 @SpringBootApplication
-@EnableConfigurationProperties(ApplicationProperties.class)
+@EnableConfigurationProperties(ReleaseNotesProperties.class)
 public class Application {
 
 	public static void main(String[] args) {
