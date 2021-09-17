@@ -49,7 +49,7 @@ By default the release notes will contain the following sections:
 |Title|Emoji|Label Text|
 |---|---|---|
 |New Features|:star:|"feat", "test" or "perf"|
-|Bug Fixes|:beetle:|"bug" or "fix"|
+|Bug Fixes|:lady_beetle:|"bug" or "fix"|
 |Documentation|:notebook_with_decorative_cover:|"doc", "docs", "style" or "chore"|
 |Refactorings|:wrench:|"refactor"|
 
@@ -58,7 +58,7 @@ Is possible to customized adding sections in the YAML properties file:
 ```yml
   sections:
     - title: Bugs
-      emoji: ":beetle:"
+      emoji: ":lady_beetle:"
       labels: bug
 ```
 
