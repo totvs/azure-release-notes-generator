@@ -23,7 +23,7 @@ public class Sections {
 		List<Section> sections = new ArrayList<>();
 
 		add(sections, "New Features", ":star:", "feat", "test", "perf");
-		add(sections, "Bug Fixes", ":beetle:", "bug", "fix");
+		add(sections, "Bug Fixes", ":lady_beetle:", "bug", "fix");
 		add(sections, "Documentation", ":notebook_with_decorative_cover:", "doc", "docs", "style", "chore");
 		add(sections, "Refactorings", ":wrench:", "refactor");
 
